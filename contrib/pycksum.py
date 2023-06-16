@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 A fuzzy checksum program based on a message posted to the spambayes list a

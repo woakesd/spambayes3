@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """sb_culler.py -- remove spam from POP3 servers, leave ham.
 
 I get about 150 spams a day and 12 viruses as background noise.  I use

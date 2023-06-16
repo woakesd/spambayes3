@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Automatically set up the user's mail client and SpamBayes.
 

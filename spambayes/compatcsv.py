@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Implement just enough of a csv parser to support sb_dbexpimp.py's needs."""
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """POP3DND - provides drag'n'drop training ability for POP3 clients.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Convert Apple Mail's emlx files to plain text files usable
 by SpamBayes's testtools.

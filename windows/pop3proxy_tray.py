@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """A script to provide an icon in the Windows taskbar tray to control the
 POP3 proxy.

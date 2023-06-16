@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """\
 To train:
     %(program)s -t ham.mbox spam.mbox

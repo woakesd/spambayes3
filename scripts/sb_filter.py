@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ## A hammie front-end to make the simple stuff simple.
 ##
