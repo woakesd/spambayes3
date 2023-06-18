@@ -110,7 +110,7 @@ setup(
     author_email = "spambayes@python.org",
     url = "http://spambayes.sourceforge.net",
     install_requires = ["lockfile>=%s" % lf_min_version,
-                        "pydns>=2.0"],
+                        "py3dns>=2.0"],
     cmdclass = {'install_scripts': install_scripts,
                 'sdist': sdist,
                 },
