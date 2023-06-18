@@ -44,6 +44,7 @@ Where OPTIONS is one or more of:
 
 import sys, os, getopt, email
 import shutil
+import io
 from spambayes import hammie, storage, mboxutils
 from spambayes.Options import options, get_pathname_option
 
