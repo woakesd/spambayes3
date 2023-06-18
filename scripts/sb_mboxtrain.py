@@ -44,6 +44,7 @@ Where OPTIONS is one or more of:
 
 import sys, os, getopt, email
 import shutil
+import io
 from spambayes import hammie, storage, mboxutils
 from spambayes.Options import options, get_pathname_option
 
@@ -59,14 +60,14 @@ def get_message(obj):
 
     """
 
-    if isinstance(obj, email.Message.Message):
+    if isinstance(obj, email.message.EmailMessage):
         return obj
     # Create an email Message object.
     if hasattr(obj, "read"):
         obj = obj.read()
     try:
         msg = email.message_from_string(obj)
-    except email.Errors.MessageParseError:
+    except email.errors.MessageParseError:
         msg = None
     return msg
 
@@ -127,7 +128,7 @@ def maildir_train(h, path, is_spam, force, removetrained):
         if loud and counter % 10 == 0:
             sys.stdout.write("\r%6d" % counter)
             sys.stdout.flush()
-        f = file(cfn, "rb")
+        f = open(cfn, "rb")
         msg = get_message(f)
         f.close()
         if not msg:
@@ -138,7 +139,7 @@ def maildir_train(h, path, is_spam, force, removetrained):
         trained += 1
         if not options["Headers", "include_trained"]:
             continue
-        f = file(tfn, "wb")
+        f = open(tfn, "wb")
         f.write(mboxutils.as_string(msg))
         f.close()
         shutil.copystat(cfn, tfn)
@@ -218,7 +219,7 @@ def mhdir_train(h, path, is_spam, force):
         if loud and counter % 10 == 0:
             sys.stdout.write("\r%6d" % counter)
             sys.stdout.flush()
-        f = file(fn, "rb")
+        f = open(fn, "rb")
         msg = get_message(f)
         f.close()
         if not msg:
@@ -228,7 +229,7 @@ def mhdir_train(h, path, is_spam, force):
         trained += 1
         if not options["Headers", "include_trained"]:
             continue
-        f = file(tfn, "wb")
+        f = open(tfn, "wb")
         f.write(mboxutils.as_string(msg))
         f.close()
         shutil.copystat(cfn, tfn)
