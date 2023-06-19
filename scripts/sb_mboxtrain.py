@@ -44,7 +44,6 @@ Where OPTIONS is one or more of:
 
 import sys, os, getopt, email
 import shutil
-import io
 from spambayes import hammie, storage, mboxutils
 from spambayes.Options import options, get_pathname_option
 
@@ -78,7 +77,7 @@ def msg_train(h, msg, is_spam, force):
     # XXX: big hack -- why is email.Message unable to represent
     # multipart/alternative?
     try:
-        mboxutils.as_string(msg)
+        mboxutils.as_bytes(msg)
     except TypeError:
         # We'll be unable to represent this as text :(
         return False
@@ -141,7 +140,7 @@ def maildir_train(h, path, is_spam, force, removetrained):
         if not options["Headers", "include_trained"]:
             continue
         f = open(tfn, "wb")
-        f.write(mboxutils.as_string(msg))
+        f.write(mboxutils.as_bytes(msg))
         f.close()
         shutil.copystat(cfn, tfn)
 
@@ -231,7 +230,7 @@ def mhdir_train(h, path, is_spam, force):
         if not options["Headers", "include_trained"]:
             continue
         f = open(tfn, "wb")
-        f.write(mboxutils.as_string(msg))
+        f.write(mboxutils.as_bytes(msg))
         f.close()
         shutil.copystat(cfn, tfn)
 
