@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 ### Train spambayes on all previously-untrained messages in a mailbox.
 ###
