@@ -9,10 +9,9 @@ class error(Exception):
     pass
 
 def open_db3hash(*args):
-    """Open a berkeleydb hash.
-       Replaces bsddb3, which is now deprecated."""
-    import berkeleydb
-    return berkeleydb.hashopen(*args)
+    """Open a bsddb3 hash."""
+    import bsddb3
+    return bsddb3.hashopen(*args)
 
 def open_dbhash(*args):
     """Open a bsddb hash.  Don't use this on Windows, unless Python 2.3 or
