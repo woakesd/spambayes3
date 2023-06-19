@@ -265,7 +265,8 @@ class Hammie:
         # close underlying database here, to prevent ignored exception
         # (berkeleydb object has already been closed) during python
         # shutdown
-        if self.bayes: self.bayes.close()
+        if self.bayes:
+            self.bayes.close()
 
 def open(filename, useDB="dbm", mode='r'):
     """Open a file, returning a Hammie instance.
