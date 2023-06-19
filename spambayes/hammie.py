@@ -137,7 +137,7 @@ class Hammie:
             disp = self.formatclues(clues)
             del msg[debugheader]
             msg.add_header(debugheader, disp)
-        result = mboxutils.as_string(msg, unixfrom=(msg.get_unixfrom()
+        result = mboxutils.as_bytes(msg, unixfrom=(msg.get_unixfrom()
                                                     is not None))
         return prob, result
 
