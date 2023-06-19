@@ -275,7 +275,7 @@ def main():
     global loud
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hfqnrd:p:g:s:o:')
+        opts, args = getopt.getopt(sys.argv[1:], 'hfqnrdv:p:g:s:o:')
     except getopt.error as msg:
         usage(2, msg)
 
@@ -304,6 +304,8 @@ def main():
             removetrained = True
         elif opt == '-o':
             options.set_from_cmdline(arg, sys.stderr)
+        elif opt == '-v':
+            globals["verbose"] = True
     pck, usedb = storage.database_type(opts)
     if args:
         usage(2, "Positional arguments not allowed")
