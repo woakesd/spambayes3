@@ -8,8 +8,13 @@ Tested on FreeBSD 13.1 using python 3.9.13.
 
 ## Progress
 
+I removed support for the Oracle Berkeley replacement as this isn't well
+supported on Open Source systems.
+
 scripts/sb_filter.py, scripts/sb_mboxtrain.py and the supporting
-modules have been convertered to Python 3 and lightly tested.
+modules have been convertered to Python 3 and more rigourously tested.
+
+They seem to be working now.
 
 ### Update to 1.1b3 [2022-06-04]
 
