@@ -1,17 +1,16 @@
 #! /usr/bin/env python
 """Module to tokenize email messages for spam filtering."""
 
-
-
+import sys
+import re
+import math
+import os
+import binascii
 import email
 import email.message
 import email.header
 import email.utils
 import email.errors
-import re
-import math
-import os
-import binascii
 import urllib.parse
 import urllib.request, urllib.parse, urllib.error
 
@@ -1252,7 +1251,9 @@ class Tokenizer:
         return get_message(obj)
 
     def tokenize(self, obj):
-        msg = self.get_message(obj)
+        msg = obj
+        if not isinstance(obj, email.message.Message):
+            msg = self.get_message(obj)
 
         for tok in self.tokenize_headers(msg):
             yield tok
@@ -1634,7 +1635,7 @@ class Tokenizer:
             # Get utf-8 content, otherwise treat as bytes/base64
             # (might be the wrong thing to do, as it reverses original sequence)
             try:
-                text = part.get_content()
+                text = part.get_payload()
             except:
                 yield "control: couldn't decode"
                 text = part.get_payload(decode=True) # get bytes
