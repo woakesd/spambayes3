@@ -1345,22 +1345,27 @@ class Tokenizer:
         # Don't ignore case in Subject lines; e.g., 'free' versus 'FREE' is
         # especially significant in this context.  Experiment showed a small
         # but real benefit to keeping case intact in this specific context.
-        x = msg.get('subject', '')
+        subject_header = msg.get('subject', '')
         try:
-            subjcharsetlist = email.header.decode_header(x)
+            subjcharsetlist = email.header.decode_header(subject_header)
         except (binascii.Error, email.errors.HeaderParseError, ValueError):
-            subjcharsetlist = [(x, 'invalid')]
-        for x, subjcharset in subjcharsetlist:
-            if subjcharset is not None:
-                yield 'subjectcharset:' + subjcharset
-            # this is a workaround for a bug in the csv module in Python
-            # <= 2.3.4 and 2.4.0 (fixed in 2.5)
-            x = x.replace('\r', ' ')
-            for w in subject_word_re.findall(x):
-                for t in tokenize_word(w):
-                    yield 'subject:' + t
-            for w in punctuation_run_re.findall(x):
-                yield 'subject:' + w
+            subjcharsetlist = [(subject_header, 'invalid')]
+        if subjcharsetlist[0][1] != 'invalid':
+            for subjpart, subjcharset in subjcharsetlist:
+                if subjcharset is not None:
+                    yield 'subjectcharset:' + subjcharset
+                    part = subjpart.decode(subjcharset)
+                # this resolves where when the part charset is None you
+                # can get a string back instead of bytes
+                elif type(subjpart) is str:
+                    part = subjpart
+                else:
+                    subjpart.decode()
+                for w in subject_word_re.findall(part):
+                    for t in tokenize_word(w):
+                        yield 'subject:' + t
+                for w in punctuation_run_re.findall(part):
+                    yield 'subject:' + w
 
         # Dang -- I can't use Sender:.  If I do,
         #     'sender:email name:python-list-admin'
