@@ -1357,7 +1357,7 @@ class Tokenizer:
                     part = subjpart.decode(subjcharset)
                 # this resolves where when the part charset is None you
                 # can get a string back instead of bytes
-                elif type(subjpart) is str:
+                elif isinstance(subjpart, str):
                     part = subjpart
                 else:
                     subjpart.decode()
