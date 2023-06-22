@@ -270,8 +270,8 @@ def main(profiling=False):
                     unixfrom = msg.get_unixfrom() is not None
                 else:
                     unixfrom = True
-            result = mboxutils.as_string(msg, unixfrom=unixfrom)
-            sys.stdout.write(result)
+            result = mboxutils.as_bytes(msg, unixfrom=unixfrom)
+            sys.stdout.buffer.write(result)
 
 if __name__ == "__main__":
     main()
