@@ -275,7 +275,7 @@ def main():
     global loud
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hfqnrdv:p:g:s:o:')
+        opts, args = getopt.getopt(sys.argv[1:], 'hfqnrvd:p:g:s:o:')
     except getopt.error as msg:
         usage(2, msg)
 
@@ -290,6 +290,9 @@ def main():
     for opt, arg in opts:
         if opt == '-h':
             usage(0)
+        elif opt == "-d":
+            usedb = arg
+            pck = "dbm"
         elif opt == "-f":
             force = True
         elif opt == "-n":
