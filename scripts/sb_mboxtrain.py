@@ -290,6 +290,9 @@ def main():
     for opt, arg in opts:
         if opt == '-h':
             usage(0)
+        elif opt == "-d":
+            usedb = arg
+            pck = "dbm"
         elif opt == "-f":
             force = True
         elif opt == "-n":

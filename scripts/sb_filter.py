@@ -127,7 +127,7 @@ def usage(code, msg=''):
     v = get_current_version()
     print(v.get_long_version("SpamBayes Command Line Filter"), file=sys.stderr)
     print(file=sys.stderr)
-    
+
     if msg:
         print(msg, file=sys.stderr)
         print(file=sys.stderr)
@@ -216,6 +216,8 @@ def main(profiling=False):
                                ['help', 'version', 'examples', 'option='])
     create_newdb = False
     do_profile = False
+    h.dbname, h.usedb = storage.database_type(opts)
+
     for opt, arg in opts:
         if opt in ('-h', '--help'):
             usage(0)
@@ -248,7 +250,9 @@ def main(profiling=False):
                     return cProfile.run("main(True)")
         elif opt == "-n":
             create_newdb = True
-    h.dbname, h.usedb = storage.database_type(opts)
+        elif opt == "-d":
+            h.dbname = arg
+            h.usedb = "dbm"
 
     if create_newdb or not os.path.exists(h.dbname):
         h.newdb()
