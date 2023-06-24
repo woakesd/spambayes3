@@ -818,7 +818,9 @@ del i, ch
 
 non_ascii_translate_tab = ''.join(non_ascii_translate_tab)
 
-
+"""
+Tokenize the mime parts of msg
+"""
 def crack_content_xyz(msg):
     yield 'content-type:' + msg.get_content_type()
 
@@ -1260,22 +1262,7 @@ class Tokenizer:
         for tok in self.tokenize_body(msg):
             yield tok
 
-    def tokenize_headers(self, msg):
-        # Special tagging of header lines and MIME metadata.
-
-        # Content-{Type, Disposition} and their params, and charsets.
-        # This is done for all MIME sections.
-        for x in msg.walk():
-            for w in crack_content_xyz(x):
-                yield w
-
-        # The rest is solely tokenization of header lines.
-        # XXX The headers in my (Tim's) spam and ham corpora are so different
-        # XXX (they came from different sources) that including several kinds
-        # XXX of header analysis renders the classifier's job trivial.  So
-        # XXX lots of this is crippled now, controlled by an ever-growing
-        # XXX collection of funky options.
-
+    def base_header_tokenize(self, msg):
         # Basic header tokenization
         # Tokenize the contents of each header field in the way Subject lines
         # are tokenized later.
@@ -1301,46 +1288,8 @@ class Tokenizer:
                     for w in subject_word_re.findall(v):
                         for t in tokenize_word(w):
                             yield "%s:%s" % (k, t)
-            if options["Tokenizer", "basic_header_tokenize_only"]:
-                return
 
-        # Habeas Headers - see http://www.habeas.com
-        if options["Tokenizer", "x-search_for_habeas_headers"]:
-            habeas_headers = [
-("X-Habeas-SWE-1", "winter into spring"),
-("X-Habeas-SWE-2", "brightly anticipated"),
-("X-Habeas-SWE-3", "like Habeas SWE (tm)"),
-("X-Habeas-SWE-4", "Copyright 2002 Habeas (tm)"),
-("X-Habeas-SWE-5", "Sender Warranted Email (SWE) (tm). The sender of this"),
-("X-Habeas-SWE-6", "email in exchange for a license for this Habeas"),
-("X-Habeas-SWE-7", "warrant mark warrants that this is a Habeas Compliant"),
-("X-Habeas-SWE-8", "Message (HCM) and not spam. Please report use of this"),
-("X-Habeas-SWE-9", "mark in spam to <http://www.habeas.com/report/>.")
-            ]
-            valid_habeas = 0
-            invalid_habeas = False
-            for opt, val in habeas_headers:
-                habeas = msg.get(opt)
-                if habeas is not None:
-                    if options["Tokenizer", "x-reduce_habeas_headers"]:
-                        if habeas == val:
-                            valid_habeas += 1
-                        else:
-                            invalid_habeas = True
-                    else:
-                        if habeas == val:
-                            yield opt.lower() + ":valid"
-                        else:
-                            yield opt.lower() + ":invalid"
-            if options["Tokenizer", "x-reduce_habeas_headers"]:
-                # If there was any invalid line, we record as invalid.
-                # If all nine lines were correct, we record as valid.
-                # Otherwise we ignore.
-                if invalid_habeas == True:
-                    yield "x-habeas-swe:invalid"
-                elif valid_habeas == 9:
-                    yield "x-habeas-swe:valid"
-
+    def tokenize_subject(self, msg):
         # Subject:
         # Don't ignore case in Subject lines; e.g., 'free' versus 'FREE' is
         # especially significant in this context.  Experiment showed a small
@@ -1370,6 +1319,7 @@ class Tokenizer:
                 for w in punctuation_run_re.findall(part):
                     yield 'subject:' + w
 
+    def tokenize_address_headers(self, msg)
         # Dang -- I can't use Sender:.  If I do,
         #     'sender:email name:python-list-admin'
         # becomes the most powerful indicator in the whole database.
@@ -1413,6 +1363,7 @@ class Tokenizer:
                 yield "%s:no real name:2**%d" % (field,
                                                  round(log2(noname_count)))
 
+    def count_common_recipient_start(self, msg):
         # Spammers sometimes send out mail alphabetically to fairly large
         # numbers of addresses.  This results in headers like:
         #   To: <itinerart@videotron.ca>
@@ -1444,10 +1395,11 @@ class Tokenizer:
                     # all such scores into a single token avoids a bunch of
                     # hapaxes like "pfxlen:28".
                     if score > 3:
-                        yield "pfxlen:big"
+                        return "pfxlen:big"
                     else:
-                        yield "pfxlen:%d" % score
+                        return "pfxlen:%d" % score
 
+    def count_common_recipient_domains(self, msg):
         # same idea as above, but works for addresses in the same domain
         # like
         #   To: "skip" <bugs@mojam.com>, <chris@mojam.com>,
@@ -1475,9 +1427,36 @@ class Tokenizer:
                     # how long the recipient domain is (e.g. "mojam.com" vs.
                     # "montanaro.dyndns.org")
                     if score > 5:
-                        yield "sfxlen:big"
+                        return "sfxlen:big"
                     else:
-                        yield "sfxlen:%d" % score
+                        return "sfxlen:%d" % score
+
+    def tokenize_headers(self, msg):
+        # Special tagging of header lines and MIME metadata.
+
+        # Content-{Type, Disposition} and their params, and charsets.
+        # This is done for all MIME sections.
+        for x in msg.walk():
+            for content_part in crack_content_xyz(x):
+                yield content_part
+
+        # The rest is solely tokenization of header lines.
+
+        if options["Tokenizer", "basic_header_tokenize"]:
+            for header_part in self.basic_header_tokenize(msg):
+                yield header_part
+            if options["Tokenizer", "basic_header_tokenize_only"]:
+                return
+
+        for subject_part in self.tokenize_subject:
+            yield subject_part
+
+        for address_part in self.tokenize_address_headers(msg):
+            yield address_part
+
+        yield self.count_common_recipient_start(msg)
+
+        yield self.count_common_recipient_domains(msg)
 
         # To:
         # Cc:
