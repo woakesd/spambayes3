@@ -1360,7 +1360,7 @@ class Tokenizer:
                 elif isinstance(subjpart, str):
                     part = subjpart
                 else:
-                    subjpart.decode()
+                    part = subjpart.decode()
                 for w in subject_word_re.findall(part):
                     for t in tokenize_word(w):
                         yield 'subject:' + t
