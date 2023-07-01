@@ -1354,7 +1354,10 @@ class Tokenizer:
             for subjpart, subjcharset in subjcharsetlist:
                 if subjcharset is not None:
                     yield 'subjectcharset:' + subjcharset
-                    part = subjpart.decode(subjcharset)
+                    try:
+                        part = subjpart.decode(subjcharset)
+                    except LookupError:
+                        part = "BADENCODING"
                 # this resolves where when the part charset is None you
                 # can get a string back instead of bytes
                 elif isinstance(subjpart, str):
@@ -1384,24 +1387,27 @@ class Tokenizer:
                 continue
 
             noname_count = 0
-            for name, addr in email.utils.getaddresses(addrlist):
-                if name:
-                    try:
-                        subjcharsetlist = email.header.decode_header(name)
-                    except (binascii.Error, email.errors.HeaderParseError,
-                            ValueError):
-                        subjcharsetlist = [(name, 'invalid')]
-                    for name, charset in subjcharsetlist:
-                        yield "%s:name:%s" % (field, name.lower())
-                        if charset is not None:
-                            yield "%s:charset:%s" % (field, charset)
-                else:
-                    noname_count += 1
-                if addr:
-                    for w in addr.lower().split('@'):
-                        yield "%s:addr:%s" % (field, w)
-                else:
-                    yield field + ":addr:none"
+            try:
+                for name, addr in email.utils.getaddresses(addrlist):
+                    if name:
+                        try:
+                            subjcharsetlist = email.header.decode_header(name)
+                        except (binascii.Error, email.errors.HeaderParseError,
+                                ValueError):
+                            subjcharsetlist = [(name, 'invalid')]
+                        for name, charset in subjcharsetlist:
+                            yield "%s:name:%s" % (field, name.lower())
+                            if charset is not None:
+                                yield "%s:charset:%s" % (field, charset)
+                    else:
+                        noname_count += 1
+                    if addr:
+                        for w in addr.lower().split('@'):
+                            yield "%s:addr:%s" % (field, w)
+                    else:
+                        yield field + ":addr:none"
+            except TypeError:
+                pass
 
             if noname_count:
                 yield "%s:no real name:2**%d" % (field,
