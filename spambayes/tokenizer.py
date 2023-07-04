@@ -1064,11 +1064,11 @@ class URLStripper(Stripper):
             url = urllib.parse.unquote(url)
             try:
                 (scheme, netloc, path, params,
-                 query, frag) = urlparse.urlparse(url)
+                 query, frag) = urllib.parse.urlparse(url)
             except ValueError:
                 pushclue("url:invalid-url")
             else:
-                if options["Tokenizer", "x-lookup_ip"]:
+                if options["Tokenizier", "x-lookup_ip"]:
                     ips = cache.lookup(netloc)
                     if not ips:
                         pushclue("url-ip:lookup error")
