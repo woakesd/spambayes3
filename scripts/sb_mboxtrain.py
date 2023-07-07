@@ -49,6 +49,7 @@ from spambayes.Options import options, get_pathname_option
 
 program = sys.argv[0]
 loud = True
+verbose = False
 
 def get_message(obj):
     """Return an email Message object.
@@ -125,7 +126,7 @@ def maildir_train(h, path, is_spam, force, removetrained):
         if (os.path.isdir(cfn)):
             continue
         counter += 1
-        if loud and counter % 10 == 0:
+        if verbose and loud and counter % 10 == 0:
             sys.stdout.write("\r%6d" % counter)
             sys.stdout.flush()
         f = open(cfn, "rb")
@@ -151,7 +152,8 @@ def maildir_train(h, path, is_spam, force, removetrained):
             os.unlink(cfn)
 
     if loud:
-        sys.stdout.write("\r%6d" % counter)
+        if verbose:
+            sys.stdout.write("\r%6d" % counter)
         sys.stdout.write("\r  Trained %d out of %d messages\n" %
                          (trained, counter))
 
@@ -273,6 +275,7 @@ def main():
     """Main program; parse options and go."""
 
     global loud
+    global verbose
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hfqnrvd:p:g:s:o:')
@@ -308,7 +311,7 @@ def main():
         elif opt == '-o':
             options.set_from_cmdline(arg, sys.stderr)
         elif opt == '-v':
-            globals["verbose"] = True
+            verbose = True
     pck, usedb = storage.database_type(opts)
     if args:
         usage(2, "Positional arguments not allowed")
