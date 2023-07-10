@@ -66,7 +66,6 @@ def get_message(obj):
     if hasattr(obj, "read"):
         obj = obj.read()
     try:
-        type(obj)
         msg = email.message_from_bytes(obj)
     except email.errors.MessageParseError:
         msg = None
