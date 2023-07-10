@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -6,8 +6,8 @@ import sys
 from setuptools import setup, find_packages
 
 if sys.version_info < (2, 4):
-    print "Error: You need at least Python 2.4 to use SpamBayes."
-    print "You're running version %s." % sys.version
+    print("Error: You need at least Python 2.4 to use SpamBayes.")
+    print("You're running version %s." % sys.version)
     sys.exit(0)
 
 # Install
@@ -40,11 +40,10 @@ class install_scripts(parent):
             s = os.path.join(self.install_dir, s)
             for e in (".py", ".pyc", ".pyo"):
                 if os.path.exists(s+e):
-                    print >> sys.stderr, "Error: old script", s+e,
-                    print >> sys.stderr, "still exists."
+                    print("Error: old script", s+e, "still exists.", file=sys.stderr)
                     err = True
         if err:
-            print >>sys.stderr, "Do you want to delete these scripts? (y/n)"
+            print("Do you want to delete these scripts? (y/n)", file=sys.stderr)
             answer = raw_input("")
             if answer == "y":
                 for s in self.old_scripts:
@@ -52,7 +51,7 @@ class install_scripts(parent):
                     for e in (".py", ".pyc", ".pyo"):
                         try:
                             os.remove(s+e)
-                            print "Removed", s+e
+                            print("Removed", s+e, file=sys.stderr)
                         except OSError:
                             pass
         return parent.run(self)
@@ -67,8 +66,8 @@ class sdist(sdist_parent):
         retval = sdist_parent.run(self)
         for archive in self.get_archive_files():
             data = file(archive, "rb").read()
-            print '\n', archive, "\n\tMD5:", md5.md5(data).hexdigest()
-            print "\tLength:", len(data)
+            print('\n', archive, "\n\tMD5:", md5.md5(data).hexdigest())
+            print("\tLength:", len(data))
         return retval
         
 scripts=['scripts/sb_client.py',
@@ -111,7 +110,7 @@ setup(
     author_email = "spambayes@python.org",
     url = "http://spambayes.sourceforge.net",
     install_requires = ["lockfile>=%s" % lf_min_version,
-                        "pydns>=2.0"],
+                        "py3dns>=2.0"],
     cmdclass = {'install_scripts': install_scripts,
                 'sdist': sdist,
                 },

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Analyse the pop3proxy's caches and produce a graph of how accurate
 classifier has been over time.  Only really meaningful if you started

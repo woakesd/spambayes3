@@ -189,7 +189,7 @@ def get_message(obj):
         msg.set_content(obj)
     return msg
 
-def as_string(msg, unixfrom=False):
+def as_bytes(msg, unixfrom=False):
     """Convert a Message object to a string in a safe-ish way.
 
     In email pkg version 2.5.4 and earlier, msg.as_string() can raise
@@ -204,10 +204,10 @@ def as_string(msg, unixfrom=False):
     bit of rearranging, but that should work nicely, and mean that all
     this code is together in one place.
     """
-    if isinstance(msg, str):
+    if isinstance(msg, bytes):
         return msg
     try:
-        return msg.as_string(unixfrom)
+        return msg.as_bytes(unixfrom)
     except TypeError:
         ty, val, tb = sys.exc_info()
         exclines = traceback.format_exception(ty, val, tb)[1:]

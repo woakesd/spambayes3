@@ -1,17 +1,16 @@
 #! /usr/bin/env python
 """Module to tokenize email messages for spam filtering."""
 
-
-
+import sys
+import re
+import math
+import os
+import binascii
 import email
 import email.message
 import email.header
 import email.utils
 import email.errors
-import re
-import math
-import os
-import binascii
 import urllib.parse
 import urllib.request, urllib.parse, urllib.error
 
@@ -1065,11 +1064,11 @@ class URLStripper(Stripper):
             url = urllib.parse.unquote(url)
             try:
                 (scheme, netloc, path, params,
-                 query, frag) = urlparse.urlparse(url)
+                 query, frag) = urllib.parse.urlparse(url)
             except ValueError:
                 pushclue("url:invalid-url")
             else:
-                if options["Tokenizer", "x-lookup_ip"]:
+                if options["Tokenizier", "x-lookup_ip"]:
                     ips = cache.lookup(netloc)
                     if not ips:
                         pushclue("url-ip:lookup error")
@@ -1252,7 +1251,9 @@ class Tokenizer:
         return get_message(obj)
 
     def tokenize(self, obj):
-        msg = self.get_message(obj)
+        msg = obj
+        if not isinstance(obj, email.message.Message):
+            msg = self.get_message(obj)
 
         for tok in self.tokenize_headers(msg):
             yield tok
@@ -1344,22 +1345,30 @@ class Tokenizer:
         # Don't ignore case in Subject lines; e.g., 'free' versus 'FREE' is
         # especially significant in this context.  Experiment showed a small
         # but real benefit to keeping case intact in this specific context.
-        x = msg.get('subject', '')
+        subject_header = msg.get('subject', '')
         try:
-            subjcharsetlist = email.header.decode_header(x)
+            subjcharsetlist = email.header.decode_header(subject_header)
         except (binascii.Error, email.errors.HeaderParseError, ValueError):
-            subjcharsetlist = [(x, 'invalid')]
-        for x, subjcharset in subjcharsetlist:
-            if subjcharset is not None:
-                yield 'subjectcharset:' + subjcharset
-            # this is a workaround for a bug in the csv module in Python
-            # <= 2.3.4 and 2.4.0 (fixed in 2.5)
-            x = x.replace('\r', ' ')
-            for w in subject_word_re.findall(x):
-                for t in tokenize_word(w):
-                    yield 'subject:' + t
-            for w in punctuation_run_re.findall(x):
-                yield 'subject:' + w
+            subjcharsetlist = [(subject_header, 'invalid')]
+        if subjcharsetlist[0][1] != 'invalid':
+            for subjpart, subjcharset in subjcharsetlist:
+                if subjcharset is not None:
+                    yield 'subjectcharset:' + subjcharset
+                    try:
+                        part = subjpart.decode(subjcharset)
+                    except LookupError:
+                        part = "BADENCODING"
+                # this resolves where when the part charset is None you
+                # can get a string back instead of bytes
+                elif isinstance(subjpart, str):
+                    part = subjpart
+                else:
+                    part = subjpart.decode()
+                for w in subject_word_re.findall(part):
+                    for t in tokenize_word(w):
+                        yield 'subject:' + t
+                for w in punctuation_run_re.findall(part):
+                    yield 'subject:' + w
 
         # Dang -- I can't use Sender:.  If I do,
         #     'sender:email name:python-list-admin'
@@ -1378,24 +1387,27 @@ class Tokenizer:
                 continue
 
             noname_count = 0
-            for name, addr in email.utils.getaddresses(addrlist):
-                if name:
-                    try:
-                        subjcharsetlist = email.header.decode_header(name)
-                    except (binascii.Error, email.errors.HeaderParseError,
-                            ValueError):
-                        subjcharsetlist = [(name, 'invalid')]
-                    for name, charset in subjcharsetlist:
-                        yield "%s:name:%s" % (field, name.lower())
-                        if charset is not None:
-                            yield "%s:charset:%s" % (field, charset)
-                else:
-                    noname_count += 1
-                if addr:
-                    for w in addr.lower().split('@'):
-                        yield "%s:addr:%s" % (field, w)
-                else:
-                    yield field + ":addr:none"
+            try:
+                for name, addr in email.utils.getaddresses(addrlist):
+                    if name:
+                        try:
+                            subjcharsetlist = email.header.decode_header(name)
+                        except (binascii.Error, email.errors.HeaderParseError,
+                                ValueError):
+                            subjcharsetlist = [(name, 'invalid')]
+                        for name, charset in subjcharsetlist:
+                            yield "%s:name:%s" % (field, name.lower())
+                            if charset is not None:
+                                yield "%s:charset:%s" % (field, charset)
+                    else:
+                        noname_count += 1
+                    if addr:
+                        for w in addr.lower().split('@'):
+                            yield "%s:addr:%s" % (field, w)
+                    else:
+                        yield field + ":addr:none"
+            except TypeError:
+                pass
 
             if noname_count:
                 yield "%s:no real name:2**%d" % (field,
@@ -1634,7 +1646,7 @@ class Tokenizer:
             # Get utf-8 content, otherwise treat as bytes/base64
             # (might be the wrong thing to do, as it reverses original sequence)
             try:
-                text = part.get_content()
+                text = part.get_payload()
             except:
                 yield "control: couldn't decode"
                 text = part.get_payload(decode=True) # get bytes

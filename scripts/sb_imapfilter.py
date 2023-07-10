@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """An IMAP filter.  An IMAP message box is scanned and all non-scored
 messages are scored and (where necessary) filtered.

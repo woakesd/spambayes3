@@ -368,13 +368,18 @@ class Classifier:
     def _remove_msg(self, wordstream, is_spam):
         self.probcache = {}    # nuke the prob cache
         if is_spam:
-            if self.nspam <= 0:
-                raise ValueError("spam count would go negative!")
-            self.nspam -= 1
+            if self.nspam > 0:
+                self.nspam -= 1
+            else:
+                pass
+                print("Warning: spam count would go negative!", file=sys.stderr)
+                #raise ValueError("spam count would go negative!")
         else:
-            if self.nham <= 0:
-                raise ValueError("non-spam count would go negative!")
-            self.nham -= 1
+            if self.nham > 0:
+                self.nham -= 1
+            else:
+                print("Warning: non-spam count would go negative!", file=sys.stderr)
+                #raise ValueError("non-spam count would go negative!")
 
         for word in set(wordstream):
             record = self._wordinfoget(word)
@@ -607,7 +612,7 @@ class Classifier:
         if os.path.exists(self.http_error_cache_name):
             try:
                 self.http_error_urls = pickle_read(self.http_error_cache_name)
-            except IOError as ValueError:
+            except (IOError, ValueError):
                 # Something went wrong loading it (bad pickle,
                 # probably).  Start afresh.
                 if options["globals", "verbose"]:
@@ -642,7 +647,7 @@ class Classifier:
         # "http://)" will trigger this.
         if not url:
             return ["url:non_resolving"]
-        
+
         from spambayes.tokenizer import Tokenizer
 
         if options["URLRetriever", "x-only_slurp_base"]:
@@ -724,7 +729,7 @@ class Classifier:
                 # This is probably a temporary error, like a timeout.
                 # For now, just bail out.
                 return []
-            
+
             fake_message_string = headers + "\r\n" + page
 
             # Retrieving the same messages over and over again will tire

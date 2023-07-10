@@ -12,7 +12,6 @@ class Hammie:
 
     This implements the basic functionality needed to score, filter, or
     train.
-
     """
 
     def __init__(self, bayes, mode):
@@ -27,14 +26,11 @@ class Hammie:
         Returns the probability the message is spam.  If evidence is
         true, returns a tuple: (probability, clues), where clues is a
         list of the words which contributed to the score.
-
         """
-
         return self.bayes.spamprob(tokenize(msg), evidence)
 
     def formatclues(self, clues, sep="; "):
         """Format the clues into something readable."""
-
         return sep.join(["%r: %.2f" % (word, prob)
                          for word, prob in clues
                          if (word[0] == '*' or
@@ -51,9 +47,7 @@ class Hammie:
         Returns the probability the message is spam.  If evidence is
         true, returns a tuple: (probability, clues), where clues is a
         list of the words which contributed to the score.
-
         """
-
         return self._scoremsg(msg, evidence)
 
     def score_and_filter(self, msg, header=None, spam_cutoff=None,
@@ -80,7 +74,6 @@ class Hammie:
 
         Returns the score and same message with a new disposition header.
         """
-
         if header == None:
             header = options["Headers", "classification_header_name"]
         if spam_cutoff == None:
@@ -137,7 +130,7 @@ class Hammie:
             disp = self.formatclues(clues)
             del msg[debugheader]
             msg.add_header(debugheader, disp)
-        result = mboxutils.as_string(msg, unixfrom=(msg.get_unixfrom()
+        result = mboxutils.as_bytes(msg, unixfrom=(msg.get_unixfrom()
                                                     is not None))
         return prob, result
 
@@ -158,9 +151,7 @@ class Hammie:
 
         If add_header is True, add a header with how it was trained (in
         case we need to untrain later)
-
         """
-
         self.bayes.learn(tokenize(msg), is_spam)
         if add_header:
             if is_spam:
@@ -176,9 +167,7 @@ class Hammie:
         msg can be a string, a file object, or a Message object.
 
         is_spam should be True if the message is spam, False if not.
-
         """
-
         self.bayes.unlearn(tokenize(msg), is_spam)
 
     def untrain_from_header(self, msg):
@@ -190,9 +179,7 @@ class Hammie:
 
         If add_header is True, add a header with how it was trained (in
         case we need to untrain later)
-
         """
-
         msg = mboxutils.get_message(msg)
         trained = msg.get(options["Headers", "trained_header_name"])
         if not trained:
@@ -213,9 +200,7 @@ class Hammie:
 
         If add_header is True, add a header with how it was trained (in
         case we need to untrain later)
-
         """
-
         self.train(msg, False, add_header)
 
     def train_spam(self, msg, add_header=False):
@@ -225,27 +210,21 @@ class Hammie:
 
         If add_header is True, add a header with how it was trained (in
         case we need to untrain later)
-
         """
-
         self.train(msg, True, add_header)
 
     def untrain_ham(self, msg):
         """Untrain bayes with a message previously trained as ham.
 
         msg can be a string, a file object, or a Message object.
-
         """
-
         self.untrain(msg, False)
 
     def untrain_spam(self, msg):
         """Untrain bayes with a message previously traned as spam.
 
         msg can be a string, a file object, or a Message object.
-
         """
-
         self.untrain(msg, True)
 
     def store(self):
@@ -254,9 +233,7 @@ class Hammie:
         This makes sure the persistent store reflects what is currently
         in memory.  You would want to do this after a write and before
         exiting.
-
         """
-
         self.bayes.store()
 
     def close(self):
@@ -265,7 +242,8 @@ class Hammie:
         # close underlying database here, to prevent ignored exception
         # (berkeleydb object has already been closed) during python
         # shutdown
-        if self.bayes: self.bayes.close()
+        if self.bayes:
+            self.bayes.close()
 
 def open(filename, useDB="dbm", mode='r'):
     """Open a file, returning a Hammie instance.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
     sb_unheader.py: cleans headers from email messages. By default, this
     removes SpamAssassin headers, specify a pattern with -p to supply

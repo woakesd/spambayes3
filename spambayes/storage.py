@@ -178,7 +178,7 @@ class DBDictClassifier(classifier.Classifier):
             print('Loading state from', self.db_name, 'database', file=sys.stderr)
 
         self.dbm = dbmstorage.open(self.db_name, self.mode)
-        self.db = shelve.Shelf(self.dbm)
+        self.db = shelve.Shelf(self.dbm, writeback=(self.mode != 'r'))
 
         if self.statekey in self.db:
             t = self.db[self.statekey]

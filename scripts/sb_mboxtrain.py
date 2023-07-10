@@ -49,6 +49,7 @@ from spambayes.Options import options, get_pathname_option
 
 program = sys.argv[0]
 loud = True
+verbose = False
 
 def get_message(obj):
     """Return an email Message object.
@@ -59,14 +60,14 @@ def get_message(obj):
 
     """
 
-    if isinstance(obj, email.Message.Message):
+    if isinstance(obj, email.message.EmailMessage):
         return obj
     # Create an email Message object.
     if hasattr(obj, "read"):
         obj = obj.read()
     try:
-        msg = email.message_from_string(obj)
-    except email.Errors.MessageParseError:
+        msg = email.message_from_bytes(obj)
+    except email.errors.MessageParseError:
         msg = None
     return msg
 
@@ -76,7 +77,7 @@ def msg_train(h, msg, is_spam, force):
     # XXX: big hack -- why is email.Message unable to represent
     # multipart/alternative?
     try:
-        mboxutils.as_string(msg)
+        mboxutils.as_bytes(msg)
     except TypeError:
         # We'll be unable to represent this as text :(
         return False
@@ -124,10 +125,10 @@ def maildir_train(h, path, is_spam, force, removetrained):
         if (os.path.isdir(cfn)):
             continue
         counter += 1
-        if loud and counter % 10 == 0:
+        if verbose and loud and counter % 10 == 0:
             sys.stdout.write("\r%6d" % counter)
             sys.stdout.flush()
-        f = file(cfn, "rb")
+        f = open(cfn, "rb")
         msg = get_message(f)
         f.close()
         if not msg:
@@ -138,8 +139,8 @@ def maildir_train(h, path, is_spam, force, removetrained):
         trained += 1
         if not options["Headers", "include_trained"]:
             continue
-        f = file(tfn, "wb")
-        f.write(mboxutils.as_string(msg))
+        f = open(tfn, "wb")
+        f.write(mboxutils.as_bytes(msg))
         f.close()
         shutil.copystat(cfn, tfn)
 
@@ -150,7 +151,8 @@ def maildir_train(h, path, is_spam, force, removetrained):
             os.unlink(cfn)
 
     if loud:
-        sys.stdout.write("\r%6d" % counter)
+        if verbose:
+            sys.stdout.write("\r%6d" % counter)
         sys.stdout.write("\r  Trained %d out of %d messages\n" %
                          (trained, counter))
 
@@ -218,7 +220,7 @@ def mhdir_train(h, path, is_spam, force):
         if loud and counter % 10 == 0:
             sys.stdout.write("\r%6d" % counter)
             sys.stdout.flush()
-        f = file(fn, "rb")
+        f = open(fn, "rb")
         msg = get_message(f)
         f.close()
         if not msg:
@@ -228,8 +230,8 @@ def mhdir_train(h, path, is_spam, force):
         trained += 1
         if not options["Headers", "include_trained"]:
             continue
-        f = file(tfn, "wb")
-        f.write(mboxutils.as_string(msg))
+        f = open(tfn, "wb")
+        f.write(mboxutils.as_bytes(msg))
         f.close()
         shutil.copystat(cfn, tfn)
 
@@ -272,9 +274,10 @@ def main():
     """Main program; parse options and go."""
 
     global loud
+    global verbose
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hfqnrd:p:g:s:o:')
+        opts, args = getopt.getopt(sys.argv[1:], 'hfqnrvd:p:g:s:o:')
     except getopt.error as msg:
         usage(2, msg)
 
@@ -289,6 +292,9 @@ def main():
     for opt, arg in opts:
         if opt == '-h':
             usage(0)
+        elif opt == "-d":
+            usedb = arg
+            pck = "dbm"
         elif opt == "-f":
             force = True
         elif opt == "-n":
@@ -303,6 +309,8 @@ def main():
             removetrained = True
         elif opt == '-o':
             options.set_from_cmdline(arg, sys.stderr)
+        elif opt == '-v':
+            verbose = True
     pck, usedb = storage.database_type(opts)
     if args:
         usage(2, "Positional arguments not allowed")
