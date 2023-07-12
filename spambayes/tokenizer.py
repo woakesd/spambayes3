@@ -1448,7 +1448,7 @@ class Tokenizer:
             if options["Tokenizer", "basic_header_tokenize_only"]:
                 return
 
-        for subject_part in self.tokenize_subject:
+        for subject_part in self.tokenize_subject(msg):
             yield subject_part
 
         for address_part in self.tokenize_address_headers(msg):
