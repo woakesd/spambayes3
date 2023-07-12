@@ -1,4 +1,4 @@
-spambayes.egg-info/*
+*.egg-info/*
 build/*
 dist/*
 test-ascii
