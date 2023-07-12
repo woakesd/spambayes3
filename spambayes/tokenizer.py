@@ -1319,7 +1319,7 @@ class Tokenizer:
                 for w in punctuation_run_re.findall(part):
                     yield 'subject:' + w
 
-    def tokenize_address_headers(self, msg)
+    def tokenize_address_headers(self, msg):
         # Dang -- I can't use Sender:.  If I do,
         #     'sender:email name:python-list-admin'
         # becomes the most powerful indicator in the whole database.
