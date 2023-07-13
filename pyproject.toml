@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spambayes"
-version = "3.3.4"
+version = "3.0.1"
 authors = [
     {name = "David Woakes", email = "david@woak.es"},
     {name = "Mark Wilson", email = "cdr.nil@gmail.com"},
@@ -35,7 +35,7 @@ classifiers = [
 dependencies = [
     "lockfile>=0.6",
     "py3dns>=2.0",
-    "bsddb3>=6.2.9",
+    "bsddb3>=6.1.0",
     'importlib-metadata; python_version<"3.8"',
 ]
 
