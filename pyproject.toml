@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spambayes"
+version = "3.3.4"
+authors = [
+    {name = "David Woakes", email = "david@woak.es"},
+    {name = "Mark Wilson", email = "cdr.nil@gmail.com"},
+]
+description = "My package description"
+readme = "README.rst"
+requires-python = ">=3.6"
+keywords = ["one"]
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Environment :: Plugins',
+    'Environment :: Win32 (MS Windows)',
+    'License :: OSI Approved :: Python Software Foundation License',
+    'Operating System :: POSIX',
+    'Operating System :: MacOS :: MacOS X',
+    'Operating System :: Microsoft :: Windows :: Windows 95/98/2000',
+    'Operating System :: Microsoft :: Windows :: Windows NT/2000',
+    'Natural Language :: English',
+    'Programming Language :: Python',
+    'Programming Language :: C',
+    'Intended Audience :: End Users/Desktop',
+    'Topic :: Communications :: Email :: Filters',
+    'Topic :: Communications :: Email :: Post-Office :: POP3',
+    'Topic :: Communications :: Email :: Post-Office :: IMAP',
+]
+dependencies = [
+    "lockfile>=0.6",
+    "py3dns>=2.0",
+    "bsddb3>=6.2.9",
+    'importlib-metadata; python_version<"3.8"',
+]
+
+[project.scripts]
+sb_filter = "spambayes.scripts.sb_filter:main"
+sb_mboxtrain = "spambayes.scripts.sb_mboxtrain:main"
+
+[tool.setuptools]
+packages = ["spambayes", "spambayes.resources", "spambayes.scripts", "spambayes.core_resources"]
