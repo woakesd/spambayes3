@@ -285,11 +285,15 @@ class Classifier:
         nham = float(self.nham or 1)
         nspam = float(self.nspam or 1)
 
-        assert hamcount <= nham, "Token seen in more ham than ham trained."
+        #assert hamcount <= nham, "Token seen in more ham than ham trained."
         hamratio = hamcount / nham
+        if hamratio > 1.0:
+            hamratio = 1.0
 
-        assert spamcount <= nspam, "Token seen in more spam than spam trained."
+        #assert spamcount <= nspam, "Token seen in more spam than spam trained."
         spamratio = spamcount / nspam
+        if spamratio > 1.0:
+            spamratio = 1.0
 
         prob = spamratio / (hamratio + spamratio)
 
