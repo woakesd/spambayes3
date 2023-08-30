@@ -1356,6 +1356,11 @@ class Tokenizer:
                     yield 'subjectcharset:' + subjcharset
                     try:
                         part = subjpart.decode(subjcharset)
+                    except UnicodeDecodeError:
+                        try:
+                            part = subjpart.decode()
+                        except:
+                            part = "BADENCODING"
                     except LookupError:
                         part = "BADENCODING"
                 # this resolves where when the part charset is None you
