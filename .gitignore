@@ -5,3 +5,4 @@ test-ascii
 test-utf8
 *~
 *__pycache__*
+*venv*
