@@ -824,7 +824,7 @@ def crack_content_xyz(msg):
 
     x = msg.get_param('type')
     if x is not None:
-        yield 'content-type/type:' + x.lower()
+        yield 'content-type/type:' + str(x).lower()
 
     try:
         for x in msg.get_charsets(None):
@@ -838,13 +838,13 @@ def crack_content_xyz(msg):
 
     x = msg.get('content-disposition')
     if x is not None:
-        yield 'content-disposition:' + x.lower()
+        yield 'content-disposition:' + str(x).lower()
 
     try:
         fname = msg.get_filename()
         if fname is not None:
             for x in crack_filename(fname):
-                yield 'filename:' + x
+                yield 'filename:' + str(x)
     except TypeError:
         # bug in email pkg?  see the thread beginning at
         # http://mail.python.org/pipermail/spambayes/2003-September/008006.html
@@ -855,7 +855,7 @@ def crack_content_xyz(msg):
     if 0:   # disabled; see comment before function
         x = msg.get('content-transfer-encoding')
         if x is not None:
-            yield 'content-transfer-encoding:' + x.lower()
+            yield 'content-transfer-encoding:' + str(x).lower()
 
 # The base64 decoder is actually very forgiving, but flubs one case:
 # if no padding is required (no trailing '='), it continues to read
