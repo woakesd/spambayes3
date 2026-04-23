@@ -1,0 +1,36 @@
+version = 1
+revision = 3
+requires-python = ">=3.8"
+
+[[package]]
+name = "lockfile"
+version = "0.12.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/17/47/72cb04a58a35ec495f96984dddb48232b551aafb95bde614605b754fe6f7/lockfile-0.12.2.tar.gz", hash = "sha256:6aed02de03cba24efabcd600b30540140634fc06cfa603822d508d5361e9f799", size = 20874, upload-time = "2015-11-25T18:29:58.279Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c8/22/9460e311f340cb62d26a38c419b1381b8593b0bb6b5d1f056938b086d362/lockfile-0.12.2-py2.py3-none-any.whl", hash = "sha256:6c3cb24f344923d30b2785d5ad75182c8ea7ac1b6171b08657258ec7429d50fa", size = 13564, upload-time = "2015-11-25T18:29:51.462Z" },
+]
+
+[[package]]
+name = "py3dns"
+version = "4.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/76/67/d7e745a5248bd7ecf2b76d3a1c8280255cbbdcb21174b171cf3c87740836/py3dns-4.0.2.tar.gz", hash = "sha256:98652e80ecec143c60f78f0e6b341631ca9a7560edd8dddfc864c02902618a39", size = 33982, upload-time = "2024-06-06T12:17:08.495Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/43/1ff28f5302a0f423d4210cacc1f12fb416b6ba1f4c7107e020d264acb625/py3dns-4.0.2-py3-none-any.whl", hash = "sha256:36bffe62b59a72cfa09c03f0bd3473e0126f20ee4285d14c07415dbf6f5fd571", size = 29589, upload-time = "2024-06-06T12:17:06.862Z" },
+]
+
+[[package]]
+name = "spambayes"
+version = "3.3.10"
+source = { editable = "." }
+dependencies = [
+    { name = "lockfile" },
+    { name = "py3dns" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lockfile", specifier = ">=0.6" },
+    { name = "py3dns", specifier = ">=2.0" },
+]
