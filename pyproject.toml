@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "spambayes"
-version = "3.3.10"
+version = "3.3.11"
 authors = [
     {name = "David Woakes", email = "david@woak.es"},
     {name = "Mark Wilson", email = "cdr.nil@gmail.com"},
