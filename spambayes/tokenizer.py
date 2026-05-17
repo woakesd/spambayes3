@@ -1203,9 +1203,25 @@ def find_html_virus_clues(text):
 
 
 numeric_entity_re = re.compile(r'&#(\d+);')
+# Matches consecutive surrogate-pair HTML entities like &#55357;&#56513; (emoji as UTF-16 pairs)
+surrogate_pair_entity_re = re.compile(r'&#(\d+);&#(\d+);')
+
+def surrogate_pair_entity_replacer(m):
+    try:
+        high, low = int(m.group(1)), int(m.group(2))
+        if 0xD800 <= high <= 0xDBFF and 0xDC00 <= low <= 0xDFFF:
+            return chr(0x10000 + (high - 0xD800) * 0x400 + (low - 0xDC00))
+        # Not a valid pair — fall through to individual handling
+        return ''.join('' if 0xD800 <= cp <= 0xDFFF else chr(cp) for cp in (high, low))
+    except:
+        return '?'
+
 def numeric_entity_replacer(m):
     try:
-        return chr(int(m.group(1)))
+        cp = int(m.group(1))
+        if 0xD800 <= cp <= 0xDFFF:
+            return ''  # skip any lone surrogates that weren't part of a pair
+        return chr(cp)
     except:
         return '?'
 
@@ -1665,8 +1681,10 @@ class Tokenizer:
                 continue
 
             # Replace numeric character entities (like &#97; for the letter
-            # 'a').
-            text = numeric_entity_re.sub(numeric_entity_replacer,text)
+            # 'a'). Handle surrogate-pair encoded emoji (e.g. &#55357;&#56513;)
+            # before individual entities so lone surrogates don't leak into tokens.
+            text = surrogate_pair_entity_re.sub(surrogate_pair_entity_replacer, text)
+            text = numeric_entity_re.sub(numeric_entity_replacer, text)
 
             # Normalize case.
             text = text.lower()

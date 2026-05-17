@@ -74,20 +74,13 @@ __author__ = "Tim Stone <tim@fourstonesExpressions.com>"
 __credits__ = "Mark Hammond, Tony Meyer, all the spambayes contributors."
 
 import sys
-import types
 import time
 import math
 import re
 import errno
 import shelve
-import warnings
 import pickle as pickle
 import traceback
-
-import email.Message
-import email.Parser
-import email.Header
-import email.Generator
 
 from spambayes import storage
 from spambayes import dbmstorage
@@ -358,33 +351,6 @@ class Message(object, email.message.EmailMessage):
         self._set_class_message_info_db(value)
     message_info_db = property(_get_message_info_db, _set_message_info_db)
 
-    # This function (and it's hackishness) can be avoided by using
-    # email.message_from_string(text, _class=SBHeaderMessage)
-    # i.e. instead of doing this:
-    #   >>> msg = spambayes.message.SBHeaderMessage()
-    #   >>> msg.setPayload(substance)
-    # you do this:
-    #   >>> msg = email.message_from_string(substance, _class=SBHeaderMessage)
-    # imapfilter has an example of this in action
-    def setPayload(self, payload):
-        """DEPRECATED.
-
-        This function does not work (as a result of using private
-        methods in a hackish way) in Python 2.4, so is now deprecated.
-        Use *_from_string as described above.
-
-        More: Python 2.4 has a new email package, and the private functions
-        are gone.  So this won't even work.  We have to do something to
-        get this to work, for the 1.0.x branch, so use a different ugly
-        hack.
-        """
-        warnings.warn("setPayload is deprecated. Use " \
-                      "email.message_from_string(payload, _class=" \
-                      "Message) instead.",
-                      DeprecationWarning, 2)
-        new_me = email.message_from_string(payload, _class=Message)
-        self.__dict__.update(new_me.__dict__)
-
     def setId(self, id):
         if self.id and self.id != id:
             raise ValueError(("MsgId has already been set,"
@@ -479,17 +445,9 @@ class Message(object, email.message.EmailMessage):
 
 class SBHeaderMessage(Message):
     '''Message class that is cognizant of SpamBayes headers.
-    Adds routines to add/remove headers for SpamBayes'''
-    def setPayload(self, payload):
-        """DEPRECATED.
-        """
-        warnings.warn("setPayload is deprecated. Use " \
-                      "email.message_from_string(payload, _class=" \
-                      "SBHeaderMessage) instead.",
-                      DeprecationWarning, 2)
-        new_me = email.message_from_string(payload, _class=SBHeaderMessage)
-        self.__dict__.update(new_me.__dict__)
-
+    Adds routines to add/remove headers for SpamBayes
+    
+    This seems to be used by tests and test frameworks, should it be in this file?'''
     def setIdFromPayload(self):
         try:
             self.setId(self[options['Headers', 'mailid_header_name']])

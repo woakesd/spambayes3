@@ -1,5 +1,14 @@
 [Note that all dates are in ISO 8601 format, e.g. YYYY-MM-DD to ease sorting]
 
+
+Release 3.3.11
+==============
+David Woakes      2026-05-17  Fix issue with HTML encoding of surrogate pairs
+
+Release 3.xxx
+=============
+David Woakes      2026-04-25  Remove setPayload methodsx§
+
 Release 3.1.0
 =============
 
